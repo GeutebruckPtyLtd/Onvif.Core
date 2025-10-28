@@ -1,20 +1,35 @@
-name: Action to build and publish the project as a nuget package to github package registry
+name: Onvif.Core
 
 on:
   push:
     branches: [master]
-      
-jobs:
-  build:
-    runs-on: ubuntu-latest    
-    outputs: 
-      Version: ${{ steps.gitversion.outputs.SemVer }}
-      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
 
+env:  
+  PROJECT_PATH: Onvif.Core.sln
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
+  NUGET_SOURCE_URL: "'https://nuget.pkg.github.com/GeutebruckPtyLtd/index.json'"
+
+jobs:
+   publish:
+    name: "Publish to NuGet Gallery"
+    runs-on: "windows-latest"
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 #fetch-depth is needed for GitVersion
-    - name: Create NuGet package  
-      if: startsWith(env.tag, 'v')  
-      run: dotnet pack --configuration Release --no-build
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        
+      - name: "Install Dotnet"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+          
+      - name: "Restore packages"
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+        
+      - name: "Build project"
+        run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release
+        
+      - name: "Pack project"
+        run: dotnet pack ${{ env.PROJECT_PATH }} -p:PackageVersion=${{ github.event.release.name }} --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+
+      - name:  "Push package"
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/<Solution Name>.${{ github.event.release.name }}.nupkg -s ${{ env.NUGET_SOURCE_URL }} -k ${{ secrets.NUGET_AUTH_TOKEN }}
