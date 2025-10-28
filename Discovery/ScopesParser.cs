@@ -1,9 +1,87 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Onvif.Core.Discovery
 {
     internal static class ScopesParser
     {
+        private const string PATTERN = @"^((onvif[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$";
+        private const int RegexProcessingTimeoutInMs = 500;
+
+        internal static bool Parse(string scopes, out string manufacturer, out string name, out string model)
+        {            
+            name = ParseNameFromScopes(scopes);
+            manufacturer = ParseMfrFromScopes(scopes, name);
+            model = ParseModelFromScopes(scopes);
+
+            if (!IsEmpty(model) && !IsEmpty(name)) 
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static bool IsEmpty(string value)
+        {
+            return string.IsNullOrEmpty(value);
+        }
+
+        private static string ParseModelFromScopes(string scopes)
+        {
+            var model = Regex.Match(scopes, "(?<=hardware/).*?(?= )", RegexOptions.None,
+                TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs)).Value;
+            return Uri.UnescapeDataString(model);
+        }
+
+        private static string ParseMfrFromScopes(string scopes, string name)
+        {
+            var scopesArray = scopes.Split();
+            
+            var mfrQuery = scopesArray.Where(scope => scope.Contains("mfr/") || scope.Contains("manufacturer/"))
+                .ToArray();
+            if (mfrQuery.Length > 0)
+            {
+                var mfrMatch = Regex.Match(mfrQuery[0], PATTERN, RegexOptions.None,
+                    TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs));
+                return Uri.UnescapeDataString(mfrMatch.Groups[6].Value);
+            }
+
+            if (IsEmpty(name)) return string.Empty;
+
+            var nameMatch = Regex.Match(name, PATTERN, RegexOptions.None,
+                TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs));
+            var mfr = Uri.UnescapeDataString(nameMatch.Groups[6].Value);
+            if (mfr.Contains(' '))
+            {
+                mfr = mfr.Split()[0];
+            }
+
+            return mfr;
+        }
+
+        private static string ParseNameFromScopes(string scopes)
+        {
+            var scopesArray = scopes.Split();
+            var nameQuery = scopesArray.Where(scope => scope.Contains("name/")).ToArray();            
+
+            if (nameQuery.Length <= 0)
+            {
+                return string.Empty;
+            }
+
+            var nameMatch = Regex.Match(nameQuery[0], PATTERN, RegexOptions.None,
+                TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs));
+            var mfr = Uri.UnescapeDataString(nameMatch.Groups[6].Value);
+            if (mfr.Contains(' '))
+            {
+                mfr = mfr.Split()[0];
+            }
+
+            return mfr;
+        }
+
+
         internal static bool Parse(string scopes, out string name, out string model)
         {
             name = string.Empty;

@@ -120,7 +120,8 @@ public class WSDiscovery : IWSDiscovery
             discoveryDevice = null;
             try
             {
-                ScopesParser.Parse(probeMatch.Scopes, out var name, out var model);
+                ScopesParser.Parse(probeMatch.Scopes, out var manufacturer, out var name, out var model);
+                //ScopesParser.Parse(probeMatch.Scopes, out var name, out var model);
 
                 discoveryDevice = new DiscoveryDevice
                 {
@@ -129,7 +130,8 @@ public class WSDiscovery : IWSDiscovery
                     XAdresses = ConvertToList(probeMatch.XAddrs),
                     Types = ConvertToList(probeMatch.Types),
                     Model = model,
-                    Name = name
+                    Name = name,
+                    Manufacturer = manufacturer,
                 };
             }
             catch (Exception ex)

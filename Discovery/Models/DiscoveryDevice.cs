@@ -11,6 +11,8 @@ public class DiscoveryDevice : IEquatable<DiscoveryDevice>
 {
     public IEnumerable<string> Types { get; internal set; }
     public IEnumerable<string> XAdresses { get; internal set; }
+
+    public string Manufacturer { get; internal set; }
     public string Model { get; internal set; }
     public string Name { get; internal set; }
     public IPAddress Address { get; internal set; }
