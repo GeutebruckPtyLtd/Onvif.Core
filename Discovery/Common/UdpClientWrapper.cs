@@ -15,6 +15,7 @@ public class UdpClientWrapper : IUdpClient
 {
     private readonly UdpClient client;
     private bool _disposedValue;
+    private string ipAddress;
 
     public short Ttl
     {
@@ -43,12 +44,14 @@ public class UdpClientWrapper : IUdpClient
 
     public UdpClientWrapper(IPEndPoint localEndPoint)
     {
+        this.ipAddress = localEndPoint.Address.ToString();
+
         IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
         IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
         foreach (IPEndPoint item in ipEndPoints)
         {
             if (item.AddressFamily == localEndPoint.AddressFamily
-                && (localEndPoint.Address.Equals(IPAddress.Any) || localEndPoint.Address.Equals(IPAddress.Any) || item.Address.Equals(localEndPoint.Address))
+                && (localEndPoint.Address.Equals(IPAddress.Any) || item.Address.Equals(localEndPoint.Address))
                 && item.Port == localEndPoint.Port)
             {
                 throw new ArgumentException($"Port {localEndPoint.Port}");
@@ -68,6 +71,11 @@ public class UdpClientWrapper : IUdpClient
     public async Task<UdpReceiveResult> ReceiveAsync()
     {
         return await client.ReceiveAsync().ConfigureAwait(false);
+    }
+
+    public string GetUdpIpAddress()
+    {
+        return ipAddress;
     }
 
     public void Close()

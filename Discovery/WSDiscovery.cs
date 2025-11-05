@@ -58,6 +58,7 @@ public class WSDiscovery : IWSDiscovery
                     break;
                 }
                 var response = await client.ReceiveAsync().WithCancellation(cts.Token).WithCancellation(cancellationToken).ConfigureAwait(false);
+                //Console.WriteLine($"WSDiscovery - response from {client.GetUdpIpAddress()}.");
                 responses.Add(response);
             }
         }

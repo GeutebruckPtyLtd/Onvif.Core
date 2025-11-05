@@ -1,7 +1,7 @@
 ﻿using Onvif.Core.Discovery.Common;
 using Onvif.Core.Discovery.Interfaces;
 using Onvif.Core.Discovery.Models;
-
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +13,9 @@ namespace Onvif.Core.Discovery;
 
 public class DiscoveryService : IDiscoveryService
 {
+
+    private ILogger _logger = Log.ForContext<DiscoveryService>();
+
     readonly IWSDiscovery wsDiscovery;
     CancellationTokenSource cancellation;
     bool isRunning;
@@ -63,6 +66,8 @@ public class DiscoveryService : IDiscoveryService
             while (isRunning)
             {
                 var devicesDiscovered = await wsDiscovery.Discover(timeout, client, cancellationToken).ConfigureAwait(false);
+                //_logger.Debug($"DiscoveryService - Discovered {devicesDiscovered.Count} fro{client.GetUdpIpAddress()} devices.");
+
                 SyncDiscoveryDevices(devicesDiscovered);
             }
         }
@@ -83,11 +88,14 @@ public class DiscoveryService : IDiscoveryService
         var lostDevices = new List<DiscoveryDevice>(DiscoveredDevices.Except(syncDevices));
         foreach (var lostDevice in lostDevices)
         {
+            //_logger.Debug($"lostDevices:{lostDevice.Address.ToString()}/{lostDevice.Model} devices.");
             DiscoveredDevices.Remove(lostDevice);
         }
+
         var newDevices = new List<DiscoveryDevice>(syncDevices.Except(DiscoveredDevices));
         foreach (var newDevice in newDevices)
         {
+            //_logger.Debug($"NewDevice:{newDevice.Address.ToString()}/{newDevice.Model} devices.");
             DiscoveredDevices.Add(newDevice);
         }
     }

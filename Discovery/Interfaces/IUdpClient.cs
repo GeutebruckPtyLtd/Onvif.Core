@@ -13,5 +13,7 @@ public interface IUdpClient : IDisposable
     short Ttl { get; set; }
     Task<int> SendAsync(byte[] datagram, int bytes, IPEndPoint endPoint);
     Task<UdpReceiveResult> ReceiveAsync();
+    string GetUdpIpAddress();
+
     void Close();
 }

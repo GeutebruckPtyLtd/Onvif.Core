@@ -9,13 +9,15 @@
     <Description>A lightweight ONVIF Discovery and Client library.</Description>
     <PackageIconUrl>https://avatars1.githubusercontent.com/u/12891248</PackageIconUrl>
     <Company>Jazea.org</Company>
-    <Version>3.0.0</Version>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <Version>3.0.0.1</Version>
+    <AssemblyVersion>3.0.0.1</AssemblyVersion>
     <PackageProjectUrl>https://github.com/Jazea/Onvif.Core</PackageProjectUrl>
     <PackageTags>onvif camera ptz</PackageTags>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <PackageIcon>icon.png</PackageIcon>
     <LangVersion>12.0</LangVersion>
+    <DebugType>None</DebugType>
+	<DebugSymbols>False</DebugSymbols>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
@@ -37,7 +39,9 @@
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.1" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="System.Buffers" Version="4.6.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
     <PackageReference Include="System.Security.AccessControl" Version="6.0.1" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.1" />
