@@ -10,11 +10,56 @@ namespace Onvif.Core.Discovery
         private const int RegexProcessingTimeoutInMs = 500;
 
         internal static bool Parse(string scopes, out string manufacturer, out string name, out string model)
-        {            
+        {
+            manufacturer = string.Empty;
+            name = string.Empty;
+            model = string.Empty;
+
+            var scopeList = scopes.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var scope in scopeList)
+            {
+                if (!Uri.TryCreate(scope, UriKind.Absolute, out var uri))
+                    continue;
+
+                var path = Uri.UnescapeDataString(uri.AbsolutePath);
+
+                if (path.StartsWith("/hardware/"))
+                    model = path.Replace("/hardware/", "");
+
+                else if (path.StartsWith("/name/"))
+                    name = path.Replace("/name/", "");
+
+                else if (path.StartsWith("/manufacturer/"))
+                    manufacturer = path.Replace("/manufacturer/", "");
+            }
+
+            // fallback: derive manufacturer from name if missing
+            if (string.IsNullOrEmpty(manufacturer) && !string.IsNullOrEmpty(name))
+            {
+                var firstPart = name.Split(new[] { ' ', '_'}, StringSplitOptions.RemoveEmptyEntries)
+                                    .FirstOrDefault();
+
+                manufacturer = firstPart ?? string.Empty;
+            }
+
+            if (name != null && name.Contains(' '))
+            {
+                if (name.Length > 1)
+                    name = name.Split()[1];
+                else
+                    name = name.Split()[0];
+            }
+
+            return !string.IsNullOrEmpty(model) && !string.IsNullOrEmpty(name);
+        }
+
+        internal static bool Parse_No(string scopes, out string manufacturer, out string name, out string model)
+        {
+            model = ParseModelFromScopes(scopes);
             name = ParseNameFromScopes(scopes);
             manufacturer = ParseMfrFromScopes(scopes, name);
-            model = ParseModelFromScopes(scopes);
-
+                        
             if (!IsEmpty(model) && !IsEmpty(name)) 
             {
                 return true;
@@ -51,6 +96,7 @@ namespace Onvif.Core.Discovery
 
             var nameMatch = Regex.Match(name, PATTERN, RegexOptions.None,
                 TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs));
+
             var mfr = Uri.UnescapeDataString(nameMatch.Groups[6].Value);
             if (mfr.Contains(' '))
             {
@@ -72,20 +118,16 @@ namespace Onvif.Core.Discovery
 
             var nameMatch = Regex.Match(nameQuery[0], PATTERN, RegexOptions.None,
                 TimeSpan.FromMilliseconds(RegexProcessingTimeoutInMs));
-            var mfr = Uri.UnescapeDataString(nameMatch.Groups[6].Value);
-            if (mfr.Contains(' '))
-            {
-                mfr = mfr.Split()[0];
-            }
-
-            return mfr;
+            
+            return Uri.UnescapeDataString(nameMatch.Groups[6].Value);
         }
 
-
-        internal static bool Parse(string scopes, out string name, out string model)
+        internal static bool Parse_old(string scopes, out string manufacturer, out string name, out string model)
         {
             name = string.Empty;
             model = string.Empty;
+            manufacturer = string.Empty;
+
             unsafe
             {
                 fixed (char* p = scopes)

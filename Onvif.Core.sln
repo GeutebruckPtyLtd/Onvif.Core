@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11513.90 insiders
+VisualStudioVersion = 18.4.11513.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Onvif.Core", "Onvif.Core.csproj", "{3235B0D4-50F8-4B2D-A71C-437ACD7D83C4}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-tasks", "build-tasks"
 	ProjectSection(SolutionItems) = preProject
 		publishPackage.ps1 = publishPackage.ps1
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Onvif.Console", "..\Onvif.Console\Onvif.Console.csproj", "{E3379B26-C4F4-7059-5EEC-C0981A91CACE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{DA67C613-AAAF-4E35-8A45-5681F069EE9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA67C613-AAAF-4E35-8A45-5681F069EE9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA67C613-AAAF-4E35-8A45-5681F069EE9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3379B26-C4F4-7059-5EEC-C0981A91CACE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3379B26-C4F4-7059-5EEC-C0981A91CACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3379B26-C4F4-7059-5EEC-C0981A91CACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3379B26-C4F4-7059-5EEC-C0981A91CACE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
