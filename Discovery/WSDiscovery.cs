@@ -75,7 +75,13 @@ public class WSDiscovery : IWSDiscovery
         {
             return devices;
         }
-        devices.AddRange(ProcessResponses(responses));
+
+        var foundDevice = ProcessResponses(responses);
+        if(foundDevice != null)
+        {
+            devices.AddRange(foundDevice);
+        }
+        
         return devices;
     }
 
@@ -95,6 +101,7 @@ public class WSDiscovery : IWSDiscovery
                 string strResponse = Encoding.UTF8.GetString(response.Buffer);
                 if (strResponse == string.Empty)
                     continue;
+
                 XmlProbeReponse xmlResponse = DeserializeResponse(strResponse);
                 foreach (var device in CreateDevices(xmlResponse, response.RemoteEndPoint))
                 {
@@ -106,6 +113,7 @@ public class WSDiscovery : IWSDiscovery
 
     XmlProbeReponse DeserializeResponse(string xml)
     {
+        //Console.WriteLine(xml);
         XmlSerializer serializer = new(typeof(XmlProbeReponse));
         XmlReaderSettings settings = new();
         using StringReader textReader = new(xml);
@@ -115,7 +123,13 @@ public class WSDiscovery : IWSDiscovery
 
     IEnumerable<DiscoveryDevice> CreateDevices(XmlProbeReponse response, IPEndPoint remoteEndpoint)
     {
-        DiscoveryDevice discoveryDevice;
+
+        DiscoveryDevice discoveryDevice = null;
+        if (response.Body == null)
+        {
+            yield return discoveryDevice;
+        }
+
         foreach (var probeMatch in response.Body.ProbeMatches)
         {
             discoveryDevice = null;
