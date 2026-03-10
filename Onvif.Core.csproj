@@ -9,8 +9,8 @@
     <Description>A lightweight ONVIF Discovery and Client library.</Description>
     <PackageIconUrl>https://avatars1.githubusercontent.com/u/12891248</PackageIconUrl>
     <Company>Jazea.org</Company>
-    <Version>3.0.0.3</Version>
-    <AssemblyVersion>3.0.0.3</AssemblyVersion>
+    <Version>3.0.0.4</Version>
+    <AssemblyVersion>3.0.0.4</AssemblyVersion>
     <PackageProjectUrl>https://github.com/Jazea/Onvif.Core</PackageProjectUrl>
     <PackageTags>onvif camera ptz</PackageTags>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
