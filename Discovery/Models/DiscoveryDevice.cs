@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 
 namespace Onvif.Core.Discovery.Models;
 
@@ -75,5 +76,17 @@ public class DiscoveryDevice : IEquatable<DiscoveryDevice>
                    .AppendObj(Address)
                    .AppendObj(EndpointReferenceAddress)
                    .Hash;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder buffer = new StringBuilder();
+
+        buffer.Append($"Manufacturer:{Manufacturer}");
+        buffer.Append($", Model:{Model}");
+        buffer.Append($", Name:{Name}");
+        buffer.Append($", Address:{Address?.ToString()}");
+
+        return buffer.ToString();
     }
 }

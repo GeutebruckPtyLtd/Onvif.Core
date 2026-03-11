@@ -31,6 +31,21 @@ public class Body
 {
     [XmlArray(Namespace = "http://schemas.xmlsoap.org/ws/2005/04/discovery")]
     public ProbeMatch[] ProbeMatches { get; set; }
+
+    [XmlElement("Fault", Namespace = "http://schemas.xmlsoap.org/soap/envelope/")]
+    public SoapFault Fault { get; set; }
+}
+
+public class SoapFault
+{
+    [XmlElement("faultcode")]
+    public string FaultCode { get; set; }
+
+    [XmlElement("faultstring")]
+    public string FaultString { get; set; }
+
+    [XmlElement("detail")]
+    public string Detail { get; set; }
 }
 
 public class ProbeMatch

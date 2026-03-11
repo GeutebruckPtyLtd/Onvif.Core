@@ -47,6 +47,7 @@ public class WSDiscovery : IWSDiscovery
         var responses = new List<UdpReceiveResult>();
         await SendProbe(client).ConfigureAwait(false);
         bool isRunning;
+
         try
         {
             isRunning = true;
@@ -58,7 +59,6 @@ public class WSDiscovery : IWSDiscovery
                     break;
                 }
                 var response = await client.ReceiveAsync().WithCancellation(cts.Token).WithCancellation(cancellationToken).ConfigureAwait(false);
-                //Console.WriteLine($"WSDiscovery - response from {client.GetUdpIpAddress()}.");
                 responses.Add(response);
             }
         }
@@ -71,6 +71,7 @@ public class WSDiscovery : IWSDiscovery
             client.Close();
             client.Dispose();
         }
+
         if (cancellationToken.IsCancellationRequested)
         {
             return devices;
@@ -88,7 +89,14 @@ public class WSDiscovery : IWSDiscovery
     async Task SendProbe(IUdpClient client)
     {
         var message = WSProbeMessageBuilder.NewProbeMessage();
-        var multicastEndpoint = new IPEndPoint(IPAddress.Parse(Constants.WS_MULTICAST_ADDRESS), Constants.WS_MULTICAST_PORT);
+
+        /*
+        var multiCastPort = client.GetUdpPort();
+        if (multiCastPort == 0) multiCastPort = Constants.WS_MULTICAST_PORT;
+        */
+        var multiCastPort = Constants.WS_MULTICAST_PORT;
+        var multicastEndpoint = new IPEndPoint(IPAddress.Parse(Constants.WS_MULTICAST_ADDRESS), multiCastPort);
+
         await client.SendAsync(message, message.Length, multicastEndpoint).ConfigureAwait(false);
     }
 
@@ -113,7 +121,6 @@ public class WSDiscovery : IWSDiscovery
 
     XmlProbeReponse DeserializeResponse(string xml)
     {
-        //Console.WriteLine(xml);
         XmlSerializer serializer = new(typeof(XmlProbeReponse));
         XmlReaderSettings settings = new();
         using StringReader textReader = new(xml);
@@ -123,12 +130,24 @@ public class WSDiscovery : IWSDiscovery
 
     IEnumerable<DiscoveryDevice> CreateDevices(XmlProbeReponse response, IPEndPoint remoteEndpoint)
     {
-
         DiscoveryDevice discoveryDevice = null;
-        if (response.Body == null)
+        if (response == null || response.Body == null)
         {
-            yield return discoveryDevice;
+            yield break;
         }
+
+        if (response.Body?.Fault != null)
+        {
+            Debug.Fail(
+                $"WS-Discovery fault received from {remoteEndpoint}, " +
+                $"Code: {response.Body.Fault?.FaultCode}, " +
+                $"Reason: {response.Body.Fault?.FaultString}");
+
+            yield break;
+        }
+
+        if (response.Body?.ProbeMatches == null)
+            yield break;
 
         foreach (var probeMatch in response.Body.ProbeMatches)
         {

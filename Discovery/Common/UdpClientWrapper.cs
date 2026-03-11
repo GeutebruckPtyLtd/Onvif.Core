@@ -16,6 +16,7 @@ public class UdpClientWrapper : IUdpClient
     private readonly UdpClient client;
     private bool _disposedValue;
     private string ipAddress;
+    private int udpPort;
 
     public short Ttl
     {
@@ -57,6 +58,9 @@ public class UdpClientWrapper : IUdpClient
                 throw new ArgumentException($"Port {localEndPoint.Port}");
             }
         }
+
+        udpPort = localEndPoint.Port;
+
         client = new UdpClient(localEndPoint)
         {
             EnableBroadcast = true
@@ -99,5 +103,10 @@ public class UdpClientWrapper : IUdpClient
     {
         Dispose(disposing: true);
         System.GC.SuppressFinalize(this);
+    }
+
+    public int GetUdpPort()
+    {
+        return udpPort;
     }
 }

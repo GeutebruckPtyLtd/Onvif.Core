@@ -15,5 +15,7 @@ public interface IUdpClient : IDisposable
     Task<UdpReceiveResult> ReceiveAsync();
     string GetUdpIpAddress();
 
+    int GetUdpPort();
+
     void Close();
 }
